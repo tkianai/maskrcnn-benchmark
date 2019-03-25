@@ -1,6 +1,6 @@
 MODEL:
   META_ARCHITECTURE: "GeneralizedRCNN"
-  WEIGHT: "X-152-COCO-for-icdar.pth"
+  WEIGHT: "output_dir/pretrained/X-152-COCO-for-icdar.pth"
   BACKBONE:
     CONV_BODY: "R-152-FPN"
   RESNETS:
