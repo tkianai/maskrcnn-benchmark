@@ -1,6 +1,6 @@
 MODEL:
   META_ARCHITECTURE: "GeneralizedRCNN"
-  WEIGHT: "catalog://Caffe2Detectron/COCO/37129812/e2e_mask_rcnn_X-152-32x8d-FPN-IN5k_1.44x"
+  WEIGHT: "X-152-COCO-for-icdar.pth"
   BACKBONE:
     CONV_BODY: "R-152-FPN"
   RESNETS:
@@ -38,3 +38,4 @@ DATASETS:
   TEST: ("icdar_lsvt_val_cocostyle",)
 DATALOADER:
   SIZE_DIVISIBILITY: 32
+OUTPUT_DIR: 'output_dir/caffe2/e2e_mask_rcnn_X-152-32x8d-FPN-IN5k_1.44x_caffe2_lsvt'
