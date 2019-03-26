@@ -95,7 +95,7 @@ def do_train(
         eta_string = str(datetime.timedelta(seconds=int(eta_seconds)))
 
         # visualize the training loss
-        if is_main_process() and not writer and iteration % 20 == 0:
+        if is_main_process() and writer is not None and iteration % 20 == 0:
             writer.add_scalar('total_loss', losses_reduced.item(), iteration)
             writer.add_scalar('loss_box_reg', loss_dict_reduced['loss_box_reg'].item(), iteration)
             writer.add_scalar('loss_classifier', loss_dict_reduced['loss_classifier'].item(), iteration)
