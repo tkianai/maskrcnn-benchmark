@@ -6,7 +6,7 @@ import time
 import torch
 import torch.distributed as dist
 
-from maskrcnn_benchmark.utils.comm import get_world_size
+from maskrcnn_benchmark.utils.comm import get_world_size, is_main_process
 from maskrcnn_benchmark.utils.metric_logger import MetricLogger
 
 
@@ -45,6 +45,17 @@ def do_train(
     checkpoint_period,
     arguments,
 ):
+
+    if is_main_process():
+        writer = None
+        try:
+            from tensorboardX import SummaryWriter
+            v_log_dir = checkpointer.save_dir + ('log' if checkpointer.save_dir.endswith('/') else '/log')
+            writer = SummaryWriter(v_log_dir)
+            print("tensorboardX was imported!")
+        except:
+            print("visualization failed! Error occured when importing tensorboardX!")
+
     logger = logging.getLogger("maskrcnn_benchmark.trainer")
     logger.info("Start training")
     meters = MetricLogger(delimiter="  ")
@@ -82,6 +93,16 @@ def do_train(
 
         eta_seconds = meters.time.global_avg * (max_iter - iteration)
         eta_string = str(datetime.timedelta(seconds=int(eta_seconds)))
+
+        # visualize the training loss
+        if is_main_process() and not writer and iteration % 20 == 0:
+            writer.add_scalar('total_loss', losses_reduced.item(), iteration)
+            writer.add_scalar('loss_box_reg', loss_dict_reduced['loss_box_reg'].item(), iteration)
+            writer.add_scalar('loss_classifier', loss_dict_reduced['loss_classifier'].item(), iteration)
+            writer.add_scalar('loss_mask', loss_dict_reduced['loss_mask'].item(), iteration)
+            writer.add_scalar('loss_objectness', loss_dict_reduced['loss_objectness'].item(), iteration)
+            writer.add_scalar('loss_rpn_box_reg', loss_dict_reduced['loss_rpn_box_reg'].item(), iteration)
+
 
         if iteration % 20 == 0 or iteration == max_iter:
             logger.info(
